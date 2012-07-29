@@ -3,10 +3,10 @@
 import sys
 import json
 
-from libs.table import AndroidTable
-from libs.content_provider import AndroidContentProvider
-from libs.open_helper import AndroidOpenHelper
-from libs.model_base import AndroidModelBase
+from adbgen.table import AndroidTable
+from adbgen.content_provider import AndroidContentProvider
+from adbgen.open_helper import AndroidOpenHelper
+from adbgen.model_base import AndroidModelBase
 
 def main():
     input_file = sys.argv[1]
