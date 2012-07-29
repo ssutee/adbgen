@@ -48,10 +48,11 @@ public class Album extends ModelBase {
 
     def properties_string(self):
         '''
-        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
         >>> print model_base.properties_string()
             private Context context;
             private int id;
+            private boolean done;
             private String name;
             private Date addedAt;
             private Date updatedAt;
@@ -70,6 +71,9 @@ public class Album extends ModelBase {
                 var_type = 'Date'
             elif column['type'] == 'float':
                 var_type = 'float'
+            elif column['type'] == 'boolean':
+                var_type = 'boolean'
+                
             result += '    private %s %s;\n' % (var_type, camel_variable_name(column['name']))
         return result
         
@@ -103,11 +107,12 @@ public class Album extends ModelBase {
     
     def from_cursor_string(self):
         '''
-        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
         >>> print model_base.from_cursor_string()
             @Override
             public void fromCursor(Cursor cursor, Context context) {
                 this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+                this.done = cursor.getInt(cursor.getColumnIndex(AlbumTable.AlbumColumns.DONE)) == 1;
                 this.name = cursor.getString(cursor.getColumnIndex(AlbumTable.AlbumColumns.NAME));
                 this.addedAt = new Date(cursor.getLong(cursor.getColumnIndex(AlbumTable.AlbumColumns.ADDED_AT)));
                 this.updatedAt = new Date(cursor.getLong(cursor.getColumnIndex(AlbumTable.AlbumColumns.UPDATED_AT)));
@@ -129,17 +134,20 @@ public class Album extends ModelBase {
                 result += 'new Date(cursor.getLong(%s));\n' % (column_index)
             elif column['type'] == 'float':
                 result += 'cursor.getFloat(%s);\n' % (column_index)
+            elif column['type'] == 'boolean':
+                result += 'cursor.getInt(%s) == 1;\n' % (column_index)
         result += '        this.context = context;\n'
         result += '    }'
         return result
         
     def to_content_values_string(self):
         '''
-        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
         >>> print model_base.to_content_values_string()
             @Override
             public ContentValues toContentValues() {
                 ContentValues values = new ContentValues();
+                values.put(AlbumTable.AlbumColumns.DONE, this.done);
                 values.put(AlbumTable.AlbumColumns.NAME, this.name);
                 values.put(AlbumTable.AlbumColumns.ADDED_AT, this.addedAt.getTime());
                 values.put(AlbumTable.AlbumColumns.UPDATED_AT, this.updatedAt.getTime());
