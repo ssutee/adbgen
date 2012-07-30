@@ -13,7 +13,7 @@ class AndroidModelBase(AndroidClassGenerator):
         self.package = package
         self.table = table
         self.columns = columns
-        self.file_name = '%s.java' % (self.table.capitalize())
+        self.file_name = '%s.java' % (camel_variable_name(self.table, upper=True))
         self.string_attrs = ['properties_string','constructor_string','get_id_string',
             'from_cursor_string','to_content_values_string']
         

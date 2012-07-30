@@ -13,7 +13,7 @@ class AndroidContentProvider(AndroidClassGenerator):
         self.package = package
         self.prefix = prefix
         self.tables = tables
-        self.file_name = '%sProvider.java' % (self.prefix.capitalize())
+        self.file_name = '%sProvider.java' % (self.prefix.upper())
         self.string_attrs = ['create_string', 'get_type_string', 'insert_string', 
             'query_string', 'delete_string', 'update_string']
                 

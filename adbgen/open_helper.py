@@ -13,7 +13,7 @@ class AndroidOpenHelper(AndroidClassGenerator):
         self.prefix = prefix
         self.tables = tables
         self.db_name = db_name
-        self.file_name = '%sOpenHelper.java' % (self.prefix.capitalize())
+        self.file_name = '%sOpenHelper.java' % (self.prefix.upper())
         self.string_attrs = ['properties_string', 'constructor_string', 'create_string', 'upgrade_string']
                         
     def header_string(self):

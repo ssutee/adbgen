@@ -2,6 +2,7 @@
 
 import doctest
 from generator import AndroidClassGenerator
+from utils import camel_variable_name
 
 class AndroidTable(AndroidClassGenerator):
     '''
@@ -15,7 +16,7 @@ class AndroidTable(AndroidClassGenerator):
         self.indexes = indexes
         self.index_create_string_vars = []
         self.index_names = []
-        self.file_name = '%sTable.java' % (self.name.capitalize())
+        self.file_name = '%sTable.java' % (camel_variable_name(self.name, upper=True))
         self.string_attrs = ['name_string', 'columns_class_string', 'indexs_create_string', 
             'create_string', 'upgrade_string']
         
