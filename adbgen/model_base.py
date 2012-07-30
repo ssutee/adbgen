@@ -63,7 +63,7 @@ public class Album extends ModelBase {
         result += '    private int id;\n'
         for column in self.columns:
             var_type = 'Object'
-            if re.match(r'varchar.*',column['type']):
+            if re.match(r'varchar.*',column['type']) or column['type'] == 'text':
                 var_type = 'String'
             elif column['type'] == 'integer':
                 var_type = 'int'
@@ -126,7 +126,7 @@ public class Album extends ModelBase {
         for column in self.columns:
             result += '        this.%s = ' % (camel_variable_name(column['name']))
             column_index = 'cursor.getColumnIndex(%sTable.%sColumns.%s)' % (self.table.capitalize(), self.table.capitalize(), column['name'].upper())
-            if re.match(r'varchar.*',column['type']):
+            if re.match(r'varchar.*',column['type']) or column['type'] == 'text':
                 result += 'cursor.getString(%s);\n' % (column_index)
             elif column['type'] == 'integer':
                 result += 'cursor.getInt(%s);\n' % (column_index)
