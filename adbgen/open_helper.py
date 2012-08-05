@@ -2,6 +2,7 @@
 
 import doctest
 from generator import AndroidClassGenerator
+from utils import camel_variable_name
 
 class AndroidOpenHelper(AndroidClassGenerator):
     '''
@@ -13,7 +14,7 @@ class AndroidOpenHelper(AndroidClassGenerator):
         self.prefix = prefix
         self.tables = tables
         self.db_name = db_name
-        self.file_name = '%sOpenHelper.java' % (self.prefix.upper())
+        self.file_name = '%sOpenHelper.java' % (camel_variable_name(self.prefix, upper=True))
         self.string_attrs = ['properties_string', 'constructor_string', 'create_string', 'upgrade_string']
                         
     def header_string(self):
@@ -40,14 +41,14 @@ class AndroidOpenHelper(AndroidClassGenerator):
         %s
         }
         '''
-        result  = 'public class %sOpenHelper extends SQLiteOpenHelper {\n' % (self.prefix.capitalize())
+        result  = 'public class %sOpenHelper extends SQLiteOpenHelper {\n' % (camel_variable_name(self.prefix, upper=True))
         result += '%s\n'
         result += '}'
         return result
         
     def properties_string(self):
         '''
-        >>> helper = AndroidOpenHelper('com.example.dot', 'Test', 'test.db', ['user','group'])
+        >>> helper = AndroidOpenHelper('com.example.dot', 'test', 'test.db', ['user','group'])
         >>> print helper.properties_string()        
             private static final String DATABASE_NAME = "test.db";
             private static final int DATABASE_VERSION = 1;
@@ -58,20 +59,20 @@ class AndroidOpenHelper(AndroidClassGenerator):
         
     def constructor_string(self):
         '''
-        >>> helper = AndroidOpenHelper('com.example.dot', 'Test', 'test.db', ['user','group'])
+        >>> helper = AndroidOpenHelper('com.example.dot', 'test', 'test.db', ['user','group'])
         >>> print helper.constructor_string()
-            public DotOpenHelper(Context context) {
+            public TestOpenHelper(Context context) {
                 super(context, DATABASE_NAME, null, DATABASE_VERSION);
             }
         '''
-        result  = '    public DotOpenHelper(Context context) {\n'
+        result  = '    public %sOpenHelper(Context context) {\n' % (camel_variable_name(self.prefix, upper=True))
         result += '        super(context, DATABASE_NAME, null, DATABASE_VERSION);\n'
         result += '    }'
         return result
         
     def create_string(self):
         '''
-        >>> helper = AndroidOpenHelper('com.example.dot', 'Test', 'test.db', ['user','group'])
+        >>> helper = AndroidOpenHelper('com.example.dot', 'test', 'test.db', ['user','group'])
         >>> print helper.create_string()
             @Override
             public void onCreate(SQLiteDatabase db) {
@@ -82,24 +83,24 @@ class AndroidOpenHelper(AndroidClassGenerator):
         result  = '    @Override\n'
         result += '    public void onCreate(SQLiteDatabase db) {\n'
         for table in self.tables:
-            result += '        %sTable.onCreate(db);\n' % (table.capitalize())
+            result += '        %sTable.onCreate(db);\n' % (camel_variable_name(table, upper=True))
         result += '    }'
         return result
 
     def upgrade_string(self):
         '''
-        >>> helper = AndroidOpenHelper('com.example.dot', 'Test', 'test.db', ['user','group'])
+        >>> helper = AndroidOpenHelper('com.example.dot', 'test', 'test.db', ['user','group'])
         >>> print helper.upgrade_string()
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                UserTable.onUpgrade(db);
-                GroupTable.onUpgrade(db);
+                UserTable.onUpgrade(db, oldVersion, newVersion);
+                GroupTable.onUpgrade(db, oldVersion, newVersion);
             }
         '''
         result  = '    @Override\n'
         result += '    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {\n'
         for table in self.tables:
-            result += '        %sTable.onUpgrade(db);\n' % (table.capitalize())        
+            result += '        %sTable.onUpgrade(db, oldVersion, newVersion);\n' % (camel_variable_name(table, upper=True))        
         result += '    }'
         return result
                 

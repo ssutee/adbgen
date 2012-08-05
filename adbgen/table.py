@@ -42,7 +42,7 @@ class AndroidTable(AndroidClassGenerator):
         %s
         }
         '''
-        result  = 'public final class %sTable {\n' % (self.name.capitalize())
+        result  = 'public final class %sTable {\n' % (camel_variable_name(self.name, upper=True))
         result += '%s\n'
         result += '}'
         return result
@@ -60,14 +60,14 @@ class AndroidTable(AndroidClassGenerator):
         
     def columns_class_string(self):
         '''
-        >>> table = AndroidTable('com.example.android', 'dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}])
+        >>> table = AndroidTable('com.example.android', 'my_dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}])
         >>> print table.columns_class_string()
-            public static class DotColumns implements BaseColumns {
+            public static class MyDotColumns implements BaseColumns {
                 public static final String COORD_X = "coord_x";
                 public static final String COORD_Y = "coord_y";
             }
         '''
-        result = '    public static class %sColumns implements BaseColumns {\n' % (self.name.capitalize())
+        result = '    public static class %sColumns implements BaseColumns {\n' % (camel_variable_name(self.name, upper=True))
         for column in self.columns:
             result += '        public static final String ' + column['name'].upper() + ' = "' + column['name'] + '";\n'
         result += '    }'
@@ -75,26 +75,26 @@ class AndroidTable(AndroidClassGenerator):
         
     def upgrade_string(self):
         '''
-        >>> table = AndroidTable('com.example.android', 'dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}])
+        >>> table = AndroidTable('com.example.android', 'my_dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}])
         >>> print table.upgrade_string()
             public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                db.execSQL("DROP TABLE IF EXISTS " + DotTable.TABLE_NAME);
-                DotTable.onCreate(db);
+                db.execSQL("DROP TABLE IF EXISTS " + MyDotTable.TABLE_NAME);
+                MyDotTable.onCreate(db);
             }
-        >>> table = AndroidTable('com.example.android', 'dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}], [{'columns': ['coord_x'], 'unique': True}])
+        >>> table = AndroidTable('com.example.android', 'my_dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}], [{'columns': ['coord_x'], 'unique': True}])
         >>> _ = table.indexs_create_string()
         >>> print table.upgrade_string()
             public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-                db.execSQL("DROP TABLE IF EXISTS " + DotTable.TABLE_NAME);
-                db.execSQL("DROP INDEX IF EXISTS " + DOT_COORD_X_INDEX_NAME);
-                DotTable.onCreate(db);
+                db.execSQL("DROP TABLE IF EXISTS " + MyDotTable.TABLE_NAME);
+                db.execSQL("DROP INDEX IF EXISTS " + MY_DOT_COORD_X_INDEX_NAME);
+                MyDotTable.onCreate(db);
             }
         '''
         result  = '    public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {\n'
-        result += '        db.execSQL("DROP TABLE IF EXISTS " + %sTable.TABLE_NAME);\n' % (self.name.capitalize())
+        result += '        db.execSQL("DROP TABLE IF EXISTS " + %sTable.TABLE_NAME);\n' % (camel_variable_name(self.name, upper=True))
         for index_name in self.index_names:
             result += '        db.execSQL("DROP INDEX IF EXISTS " + %s);\n' % (index_name)        
-        result += '        %sTable.onCreate(db);\n' % (self.name.capitalize())
+        result += '        %sTable.onCreate(db);\n' % (camel_variable_name(self.name, upper=True))
         result += '    }'
         return result
         
@@ -125,24 +125,24 @@ class AndroidTable(AndroidClassGenerator):
                 db.execSQL(sb.toString());
                 db.execSQL(INDEX_DOT_COORD_X_CREATE);
             }
-        >>> table = AndroidTable('com.example.android', 'dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}], [{'columns': ['coord_x'], 'unique': True},{'columns': ['coord_x', 'coord_y'], 'unique': False}])
+        >>> table = AndroidTable('com.example.android', 'my_dot', [{'name':'coord_x','type':'integer','options':'unique'}, {'name':'coord_y','type':'integer'}], [{'columns': ['coord_x'], 'unique': True},{'columns': ['coord_x', 'coord_y'], 'unique': False}])
         >>> _ = table.indexs_create_string()
         >>> print table.create_string()
             public static void onCreate(SQLiteDatabase db) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("CREATE TABLE " + DotTable.TABLE_NAME + " (");
+                sb.append("CREATE TABLE " + MyDotTable.TABLE_NAME + " (");
                 sb.append(BaseColumns._ID + " INTEGER PRIMARY KEY, ");
-                sb.append(DotColumns.COORD_X + " INTEGER UNIQUE, ");
-                sb.append(DotColumns.COORD_Y + " INTEGER");
+                sb.append(MyDotColumns.COORD_X + " INTEGER UNIQUE, ");
+                sb.append(MyDotColumns.COORD_Y + " INTEGER");
                 sb.append(");");
                 db.execSQL(sb.toString());
-                db.execSQL(INDEX_DOT_COORD_X_CREATE);
-                db.execSQL(INDEX_DOT_COORD_X_COORD_Y_CREATE);
+                db.execSQL(INDEX_MY_DOT_COORD_X_CREATE);
+                db.execSQL(INDEX_MY_DOT_COORD_X_COORD_Y_CREATE);
             }
         '''
         result  = '    public static void onCreate(SQLiteDatabase db) {\n'
         result += '        StringBuilder sb = new StringBuilder();\n'
-        result += '        sb.append("CREATE TABLE " + %sTable.TABLE_NAME + " (");\n' % (self.name.capitalize())
+        result += '        sb.append("CREATE TABLE " + %sTable.TABLE_NAME + " (");\n' % (camel_variable_name(self.name, upper=True))
         result += '        sb.append(BaseColumns._ID + " INTEGER PRIMARY KEY, ");\n'
 
         for index, column in enumerate(self.columns):
@@ -151,7 +151,8 @@ class AndroidTable(AndroidClassGenerator):
                 tails += ' %s' % (column['options'].upper())
             if index < len(self.columns) - 1:
                 tails += ', '
-            result += '        sb.append(%sColumns.%s + " INTEGER%s");\n' % (self.name.capitalize(), column['name'].upper(), tails)
+            result += '        sb.append(%sColumns.%s + " %s%s");\n' % (camel_variable_name(self.name, upper=True), 
+                column['name'].upper(), column['type'].upper(), tails)
         result += '        sb.append(");");\n'
         result += '        db.execSQL(sb.toString());\n'
         for index_create_string_var in self.index_create_string_vars:

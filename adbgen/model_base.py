@@ -41,10 +41,10 @@ import android.database.Cursor;''' % (self.package)
         %s
         }
         '''
-        return '''\
-public class Album extends ModelBase {
-%s
-}'''
+        result  = 'public class %s extends ModelBase {\n' % (camel_variable_name(self.table, upper=True))
+        result += '%s\n'
+        result += '}'
+        return result
 
     def properties_string(self):
         '''
@@ -88,7 +88,7 @@ public class Album extends ModelBase {
         return '''\
     public %s() {
         super();
-    }''' % (self.table.capitalize())
+    }''' % (camel_variable_name(self.table, upper=True))
     
     def get_id_string(self):
         '''
@@ -107,15 +107,15 @@ public class Album extends ModelBase {
     
     def from_cursor_string(self):
         '''
-        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'my_book', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
         >>> print model_base.from_cursor_string()
             @Override
             public void fromCursor(Cursor cursor, Context context) {
                 this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-                this.done = cursor.getInt(cursor.getColumnIndex(AlbumTable.AlbumColumns.DONE)) == 1;
-                this.name = cursor.getString(cursor.getColumnIndex(AlbumTable.AlbumColumns.NAME));
-                this.addedAt = new Date(cursor.getLong(cursor.getColumnIndex(AlbumTable.AlbumColumns.ADDED_AT)));
-                this.updatedAt = new Date(cursor.getLong(cursor.getColumnIndex(AlbumTable.AlbumColumns.UPDATED_AT)));
+                this.done = cursor.getInt(cursor.getColumnIndex(MyBookTable.MyBookColumns.DONE)) == 1;
+                this.name = cursor.getString(cursor.getColumnIndex(MyBookTable.MyBookColumns.NAME));
+                this.addedAt = new Date(cursor.getLong(cursor.getColumnIndex(MyBookTable.MyBookColumns.ADDED_AT)));
+                this.updatedAt = new Date(cursor.getLong(cursor.getColumnIndex(MyBookTable.MyBookColumns.UPDATED_AT)));
                 this.context = context;
             }
         '''
@@ -125,7 +125,7 @@ public class Album extends ModelBase {
         result += '        this.id = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));\n'
         for column in self.columns:
             result += '        this.%s = ' % (camel_variable_name(column['name']))
-            column_index = 'cursor.getColumnIndex(%sTable.%sColumns.%s)' % (self.table.capitalize(), self.table.capitalize(), column['name'].upper())
+            column_index = 'cursor.getColumnIndex(%sTable.%sColumns.%s)' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=True), column['name'].upper())
             if re.match(r'varchar.*',column['type']) or column['type'] == 'text':
                 result += 'cursor.getString(%s);\n' % (column_index)
             elif column['type'] == 'integer':
@@ -142,15 +142,15 @@ public class Album extends ModelBase {
         
     def to_content_values_string(self):
         '''
-        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'my_book', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
         >>> print model_base.to_content_values_string()
             @Override
             public ContentValues toContentValues() {
                 ContentValues values = new ContentValues();
-                values.put(AlbumTable.AlbumColumns.DONE, this.done);
-                values.put(AlbumTable.AlbumColumns.NAME, this.name);
-                values.put(AlbumTable.AlbumColumns.ADDED_AT, this.addedAt.getTime());
-                values.put(AlbumTable.AlbumColumns.UPDATED_AT, this.updatedAt.getTime());
+                values.put(MyBookTable.MyBookColumns.DONE, this.done);
+                values.put(MyBookTable.MyBookColumns.NAME, this.name);
+                values.put(MyBookTable.MyBookColumns.ADDED_AT, this.addedAt.getTime());
+                values.put(MyBookTable.MyBookColumns.UPDATED_AT, this.updatedAt.getTime());
             	return values;
             }
         '''
@@ -159,9 +159,9 @@ public class Album extends ModelBase {
         result += '        ContentValues values = new ContentValues();\n'
         for column in self.columns:
             if column['type'] == 'timestamp':
-                result += '        values.put(%sTable.%sColumns.%s, this.%s.getTime());\n' % (self.table.capitalize(), self.table.capitalize(), column['name'].upper(), camel_variable_name(column['name']))
+                result += '        values.put(%sTable.%sColumns.%s, this.%s.getTime());\n' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=True), column['name'].upper(), camel_variable_name(column['name']))
             else:
-                result += '        values.put(%sTable.%sColumns.%s, this.%s);\n' % (self.table.capitalize(), self.table.capitalize(), column['name'].upper(), camel_variable_name(column['name']))
+                result += '        values.put(%sTable.%sColumns.%s, this.%s);\n' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=True), column['name'].upper(), camel_variable_name(column['name']))
         result += '        return values;\n'
         result += '    }'
         return result

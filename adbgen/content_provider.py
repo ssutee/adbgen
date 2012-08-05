@@ -13,8 +13,8 @@ class AndroidContentProvider(AndroidClassGenerator):
         self.package = package
         self.prefix = prefix
         self.tables = tables
-        self.file_name = '%sProvider.java' % (self.prefix.upper())
-        self.string_attrs = ['create_string', 'get_type_string', 'insert_string', 
+        self.file_name = '%sProvider.java' % (self.prefix)
+        self.string_attrs = ['properties_string', 'create_string', 'get_type_string', 'insert_string', 
             'query_string', 'delete_string', 'update_string']
                 
     def header_string(self):
@@ -55,7 +55,7 @@ class AndroidContentProvider(AndroidClassGenerator):
         %s
         }
         '''
-        result  = 'public class OMUProvider extends ContentProvider {\n'
+        result  = 'public class %sProvider extends ContentProvider {\n' % (self.prefix)
         result += '%s\n'
         result += '}'
         return result
@@ -94,7 +94,7 @@ class AndroidContentProvider(AndroidClassGenerator):
         <BLANKLINE>
         '''
         auto_id = 1000
-        result  = '    private %sOpenHelper dbHelper;\n' % (self.prefix.capitalize())
+        result  = '    private %sOpenHelper dbHelper;\n' % (self.prefix)
         result += '    private SQLiteDatabase database;\n'
         result += '    public static final String AUTHORITY = "%s.contentprovider";\n' % (self.package)
         result += '    private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);\n\n'
@@ -127,7 +127,7 @@ class AndroidContentProvider(AndroidClassGenerator):
         '''
         result  = '    @Override\n'
         result += '    public boolean onCreate() {\n'
-        result += '        dbHelper = new %sOpenHelper(getContext());\n' % (self.prefix.capitalize())
+        result += '        dbHelper = new %sOpenHelper(getContext());\n' % (self.prefix)
         result += '        database = dbHelper.getWritableDatabase();\n'
         result += '        return true;\n'
         result += '    }'
@@ -173,7 +173,7 @@ class AndroidContentProvider(AndroidClassGenerator):
             id = database.insert(%sTable.TABLE_NAME, null, values);
             getContext().getContentResolver().notifyChange(uri, null);
             return Uri.parse("content://" + AUTHORITY + "/" + %s_PATH + "/" + id);\n''' % \
-                (table.upper(), table.capitalize(), table.upper())
+                (table.upper(), camel_variable_name(table, upper=True), table.upper())
         return result    
         
     def insert_string(self):
@@ -222,7 +222,7 @@ class AndroidContentProvider(AndroidClassGenerator):
         case %s_ID:
             queryBuilder.setTables(%sTable.TABLE_NAME);
             queryBuilder.appendWhere(BaseColumns._ID + "=" + uri.getLastPathSegment());
-            break;\n''' % (table.upper(), table.capitalize(), table.upper(), table.capitalize())
+            break;\n''' % (table.upper(), camel_variable_name(table, upper=True), table.upper(), camel_variable_name(table, upper=True))
         return result    
         
     def query_string(self):
@@ -288,8 +288,8 @@ class AndroidContentProvider(AndroidClassGenerator):
                 rowsUpdated = database.update(%sTable.TABLE_NAME, values, BaseColumns._ID + "=" + %sId + " AND " + selection, selectionArgs);
             }
             break;\n''' % (
-                table.upper(), table.capitalize(), table.upper(), camel_variable_name(table),
-                table.capitalize(), camel_variable_name(table), table.capitalize(), camel_variable_name(table)
+                table.upper(), camel_variable_name(table, upper=True), table.upper(), camel_variable_name(table),
+                camel_variable_name(table, upper=True), camel_variable_name(table), camel_variable_name(table, upper=True), camel_variable_name(table)
             )
         return result        
         
@@ -362,8 +362,8 @@ class AndroidContentProvider(AndroidClassGenerator):
                 rowsDeleted = database.delete(%sTable.TABLE_NAME, BaseColumns._ID + "=" + %sId + " AND " + selection, selectionArgs);
             }
             break;\n''' % (
-                table.upper(), table.capitalize(), table.upper(), camel_variable_name(table),
-                table.capitalize(), camel_variable_name(table), table.capitalize(), camel_variable_name(table)
+                table.upper(), camel_variable_name(table, upper=True), table.upper(), camel_variable_name(table),
+                camel_variable_name(table, upper=True), camel_variable_name(table), camel_variable_name(table, upper=True), camel_variable_name(table)
             )
         return result
         
