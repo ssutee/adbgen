@@ -15,19 +15,21 @@ class AndroidModelBase(AndroidClassGenerator):
         self.columns = columns
         self.file_name = '%s.java' % (camel_variable_name(self.table, upper=True))
         self.string_attrs = ['properties_string','constructor_string','get_id_string',
-            'from_cursor_string','to_content_values_string']
+            'from_cursor_string','to_content_values_string', 'new_instance_from_cursor_string']
         
     def header_string(self):
         '''
         >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'Album', [])
         >>> print model_base.header_string()
         package com.touchsi.android.opd.model;
+        import android.provider.BaseColumns;
         import android.content.ContentValues;
         import android.content.Context;
         import android.database.Cursor;
         '''
         result = '''\
 package %s;
+import android.provider.BaseColumns;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;''' % (self.package)
@@ -104,6 +106,23 @@ import android.database.Cursor;''' % (self.package)
     public int getId() {
         return id;
     }'''
+    
+    def new_instance_from_cursor_string(self):
+        '''
+        >>> model_base = AndroidModelBase('com.touchsi.android.opd.model', 'my_book', [{"name": "done","type": "boolean"},{"name": "name","type": "varchar(100)","options": "unique"},{"name": "added_at","type": "timestamp","options": "default current_timestamp"},{"name": "updated_at","type": "timestamp","options": "default current_timestamp"}])
+        >>> print model_base.new_instance_from_cursor_string()
+            public static MyBook newInstance(Cursor cursor, Context context) {
+                MyBook myBook = new MyBook();
+                myBook.fromCursor(cursor, context);
+                return myBook;
+            }
+        '''
+        result  = '    public static %s newInstance(Cursor cursor, Context context) {\n' % (camel_variable_name(self.table, upper=True))
+        result += '        %s %s = new MyBook();\n' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=False))
+        result += '        %s.fromCursor(cursor, context);\n' % (camel_variable_name(self.table, upper=False))
+        result += '        return %s;\n' % (camel_variable_name(self.table, upper=False))
+        result += '    }'
+        return result
     
     def from_cursor_string(self):
         '''
