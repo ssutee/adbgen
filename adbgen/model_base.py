@@ -118,7 +118,7 @@ import android.database.Cursor;''' % (self.package)
             }
         '''
         result  = '    public static %s newInstance(Cursor cursor, Context context) {\n' % (camel_variable_name(self.table, upper=True))
-        result += '        %s %s = new MyBook();\n' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=False))
+        result += '        %s %s = new %s();\n' % (camel_variable_name(self.table, upper=True), camel_variable_name(self.table, upper=False), camel_variable_name(self.table, upper=True))
         result += '        %s.fromCursor(cursor, context);\n' % (camel_variable_name(self.table, upper=False))
         result += '        return %s;\n' % (camel_variable_name(self.table, upper=False))
         result += '    }'
