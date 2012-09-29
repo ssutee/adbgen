@@ -1,5 +1,3 @@
-package com.touchsi.android.opd.model;
-
 import java.util.ArrayList;
 import java.util.List;
 

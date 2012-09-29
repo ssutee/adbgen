@@ -1,5 +1,3 @@
-package com.touchsi.android.opd.model;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
