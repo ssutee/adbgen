@@ -151,7 +151,7 @@ import android.database.Cursor;''' % (self.package)
                 result += 'cursor.getInt(%s);\n' % (column_index)
             elif column['type'] == 'timestamp':
                 result += 'new Date(cursor.getLong(%s));\n' % (column_index)
-            elif column['type'] == 'float':
+            elif column['type'] == 'float' or column['type'] == 'real':
                 result += 'cursor.getFloat(%s);\n' % (column_index)
             elif column['type'] == 'boolean':
                 result += 'cursor.getInt(%s) == 1;\n' % (column_index)
