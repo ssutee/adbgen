@@ -69,7 +69,7 @@ class AndroidTable(AndroidClassGenerator):
         '''
         result = '    public static class %sColumns implements BaseColumns {\n' % (camel_variable_name(self.name, upper=True))
         for column in self.columns:
-            result += '        public static final String ' + column['name'].upper() + ' = "' + column['name'] + '";\n'
+            result += '        public static final String ' + column['name'].upper() + ' = "' + column['name'] + '_column";\n'
         result += '    }'
         return result
         
