@@ -56,7 +56,7 @@ class AndroidTable(AndroidClassGenerator):
         >>> print table.name_string()
             public static final String TABLE_NAME = "dash";
         '''
-        return '    public static final String TABLE_NAME = "%s";' % (self.name)
+        return '    public static final String TABLE_NAME = "%s_table";' % (self.name)
         
     def columns_class_string(self):
         '''
