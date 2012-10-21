@@ -71,7 +71,7 @@ import android.database.Cursor;''' % (self.package)
                 var_type = 'int'
             elif column['type'] == 'timestamp':
                 var_type = 'Date'
-            elif column['type'] == 'float':
+            elif column['type'] == 'float' or column['type'] == 'real':
                 var_type = 'float'
             elif column['type'] == 'boolean':
                 var_type = 'boolean'
